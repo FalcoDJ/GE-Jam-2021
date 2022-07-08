@@ -1,0 +1,115 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://assets/Moose/moose.png" type="Texture" id=1]
+[ext_resource path="res://src/Moose/Moose.gd" type="Script" id=2]
+[ext_resource path="res://src/TouchControls/SwipeDetector.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/TouchControls/Accelerometer.tscn" type="PackedScene" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 7, 9.5 )
+
+[sub_resource type="Animation" id=3]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "dash_left"
+
+[sub_resource type="Animation" id=2]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "move"
+length = 0.8
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+}
+
+[node name="Moose" type="KinematicBody2D"]
+collision_layer = 4
+script = ExtResource( 2 )
+Max_Speed = 80.0
+Acc_and_Fric = 6.0
+Dash_Speed = 120.0
+Max_Jump_Height = 26.0
+Min_Jump_Height = 12.0
+Max_Fall_Speed = 250.0
+Gravity_Scaler = 2.5
+Jump_Duration = 0.3
+Coyote_Timer_Duration = 0.15
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -9.5 )
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, -11 )
+texture = ExtResource( 1 )
+hframes = 9
+
+[node name="CameraPosition2D" type="Position2D" parent="."]
+position = Vector2( 9, -12 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+reset_on_save = false
+anims/RESET = SubResource( 3 )
+anims/dash_left = SubResource( 5 )
+anims/idle = SubResource( 2 )
+anims/move = SubResource( 4 )
+
+[node name="SwipeDetector" parent="." instance=ExtResource( 3 )]
+MAX_SWIPE_LENGTH = 75.0
+TIMER_TIME = 0.5
+
+[node name="Accelerometer" parent="." instance=ExtResource( 4 )]
+RANGE = 0.2
+MULTIPLIER = 5.0
+THRESHOLD = 0.2
+
+[node name="DashTimer" type="Timer" parent="."]
+process_mode = 0
+wait_time = 0.4
+one_shot = true
+
+[node name="DashCoolDown" type="Timer" parent="."]
+process_mode = 0
+wait_time = 0.2
+one_shot = true
+
+[connection signal="swiped" from="SwipeDetector" to="." method="_on_SwipeDetector_swiped"]
+[connection signal="tilt_detected_on_x_axis" from="Accelerometer" to="." method="_on_Accelerometer_tilt_detected_on_x_axis"]
+[connection signal="timeout" from="DashTimer" to="." method="_on_DashTimer_timeout"]
+[connection signal="timeout" from="DashCoolDown" to="." method="_on_DashCoolDown_timeout"]

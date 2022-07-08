@@ -1,0 +1,14 @@
+[remap]
+
+importer="com.timothyqiu.gdfxr.importer"
+type="AudioStreamSample"
+path="res://.import/move.sfxr-27c54f53104aa8ae2e16d76871de1a6b.sample"
+
+[deps]
+
+source_file="res://assets/Snails/move.sfxr"
+dest_files=[ "res://.import/move.sfxr-27c54f53104aa8ae2e16d76871de1a6b.sample" ]
+
+[params]
+
+loop=false
